@@ -194,6 +194,38 @@ func TestAccGlueCatalogDatabase_targetDatabaseWithRegion(t *testing.T) {
 	})
 }
 
+// func TestAccGlueCatalogDatabase_federatedDatabase(t *testing.T) {
+// 	ctx := acctest.Context(t)
+// 	resourceName := "aws_glue_catalog_database.test"
+// 	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
+//
+// 	resource.ParallelTest(t, resource.TestCase{
+// 		PreCheck:                 func() { acctest.PreCheck(ctx, t) },
+// 		ErrorCheck:               acctest.ErrorCheck(t, glue.EndpointsID),
+// 		ProtoV5ProviderFactories: acctest.ProtoV5ProviderFactories,
+// 		CheckDestroy:             testAccCheckDatabaseDestroy(ctx),
+// 		Steps: []resource.TestStep{
+// 			{
+// 				Config:  testAccCatalogDatabaseConfig_federatedDatabase(rName),
+// 				Destroy: false,
+// 				Check: resource.ComposeAggregateTestCheckFunc(
+// 					testAccCheckCatalogDatabaseExists(ctx, resourceName),
+// 					resource.TestCheckResourceAttr(resourceName, "name", rName),
+// 					acctest.CheckResourceAttrRegionalARN(resourceName, "arn", "glue", fmt.Sprintf("database/%s", rName)),
+// 					resource.TestCheckResourceAttr(resourceName, "federated_database.#", "1"),
+// 					resource.TestCheckResourceAttr(resourceName, "federated_database.connection_name", "foo"),
+// 					resource.TestCheckResourceAttr(resourceName, "federated_database.identifier", "bar"),
+// 				),
+// 			},
+// 			{
+// 				ResourceName:      resourceName,
+// 				ImportState:       true,
+// 				ImportStateVerify: true,
+// 			},
+// 		},
+// 	})
+// }
+
 func TestAccGlueCatalogDatabase_tags(t *testing.T) {
 	ctx := acctest.Context(t)
 	resourceName := "aws_glue_catalog_database.test"
@@ -318,6 +350,35 @@ resource "aws_glue_catalog_database" "test" {
   }
 }
 `, rName, desc)
+}
+
+func testAccCatalogDatabaseConfig_federatedDatabase(rName string) string {
+	return fmt.Sprintf(`
+# TODO redshift cluster (standard) or redshiftserverless workgroup
+#   Format of data share ARN seems to indicate serverless might be easier
+#   to reconstruct the result data share ARN.
+
+# TODO - redshiftdata statement to create the data share
+
+# TODO - this resource does not yet exist
+resource "aws_redshift_data_share_consumer_association" "test" {
+  data_share_arn = "" # data share ARN
+  consumer_arn   = "" # glue catalog ARN
+}
+
+resource "aws_lakeformation_resource" "test" {
+  arn = "" # data share ARN 
+}
+
+resource "aws_glue_catalog_database" "test" {
+  name = %[1]q
+
+  federated_database {
+    connection_name = "aws:redshift"
+    identifier      = "" # data share arn 
+  }
+}
+`, rName)
 }
 
 func testAccCatalogDatabaseConfig_target(rName string) string {
