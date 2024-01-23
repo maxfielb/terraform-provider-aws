@@ -621,8 +621,8 @@ func ResourceUserPool() *schema.Resource {
 		StateUpgraders: []schema.StateUpgrader{
 			{
 				// Schema V1 fixed field "username_configuration" missing Default value and allows for change in API behavior to begin returning this field by default.
-				Type:    resourceUserPoolConfigV1().CoreConfigSchema().ImpliedType(),
-				Upgrade: userPoolStateUpgradeV1,
+				Type:    resourceUserPoolConfigV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: userPoolStateUpgradeV0,
 				Version: 1,
 			},
 		},
