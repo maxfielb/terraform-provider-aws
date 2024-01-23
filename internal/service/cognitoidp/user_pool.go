@@ -552,6 +552,7 @@ func ResourceUserPool() *schema.Resource {
 			"username_configuration": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Default: {"username_configuration": { "case_sensitive": true } },	// ADDED IN VERSION 1
 				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -615,6 +616,16 @@ func ResourceUserPool() *schema.Resource {
 		},
 
 		CustomizeDiff: verify.SetTagsDiff,
+		Version: 1,
+
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				// Schema V1 fixed field "username_configuration" missing Default value and allows for change in API behavior to begin returning this field by default.
+				Type:    UserPoolConfigV1().CoreConfigSchema().ImpliedType(),
+				Upgrade: userPoolStateUpgradeV1,
+				Version: 1,
+			},
+		},
 	}
 }
 
