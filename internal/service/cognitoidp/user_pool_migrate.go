@@ -13,7 +13,7 @@ import (
   	"github.com/hashicorp/terraform-provider-aws/names"
 )
 
-func userPoolStateUpgradeV1(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+func userPoolStateUpgradeV0(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
     if rawState == nil {
 		rawState = map[string]interface{}{}
 	}
